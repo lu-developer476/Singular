@@ -11,3 +11,9 @@ def test_formatter_is_idempotent():
     source = 'value total=0;for n in range(1,5){total=total+n;}print(total);'
     formatted = format_source(source)
     assert format_source(formatted) == formatted
+
+
+def test_map_literal_stays_attached_to_statement_terminator():
+    source = 'value data={"answer":42};print(data.answer);'
+    expected = 'value data = {\n    "answer": 42\n};\nprint(data.answer);\n'
+    assert format_source(source) == expected
