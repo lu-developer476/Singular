@@ -37,6 +37,13 @@ value input = json_parse("{\"count\":3,\"valid\":true}");
 print(json_stringify(input));
 ```
 
+## Numeric reproducibility contract
+
+- Integer arithmetic retains arbitrary precision; decimal and scientific literals use IEEE-754 binary64.
+- Numeric comparisons are exact language comparisons. No epsilon or tolerance is applied automatically: for example, `0.1 + 0.2 == 0.3` evaluates to `false`.
+- Mixed integer/float comparisons follow the runtime's numeric comparison semantics; large integers are not rounded merely by being stored or serialized as integers.
+- Arithmetic that produces a non-finite float is rejected. JSON serialization is compact, sorts object keys lexicographically, preserves Unicode, and rejects non-finite values. This defines stable output for the same values; it is not a promise of bit-identical floating-point results across different hardware or runtimes.
+
 ## Runtime behavior
 
 - `and` and `or` short-circuit and return boolean values.
