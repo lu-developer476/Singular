@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "singular-language"
+version = "1.8.0"
+description = "Minimal deterministic programming language"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+[project.scripts]
+singular = "src.singular.__main__:main"
+[tool.setuptools.packages.find]
+include = ["src*"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
