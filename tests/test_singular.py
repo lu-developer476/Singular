@@ -47,3 +47,25 @@ def test_singular_rejects_float_literal_underflow_to_zero_with_source_location()
     assert error.value.line == 1
     assert error.value.column == 7
     assert 'smaller than the supported floating-point range' in error.value.message
+
+
+def test_singular_rejects_non_finite_arithmetic_results():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError, match="non-finite"):
+        run("print(1e308 * 1e308);")
+
+
+def test_singular_preserves_integer_precision_and_binary64_arithmetic():
+    output = []
+    run("print(900719925474099312345 + 1); print(10 / 4); print(10 % 4);", output.append)
+    assert output == ["900719925474099312346", "2.5", "2"]
+
+
+def test_singular_normalizes_division_by_zero():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError):
+        run("print(1 / 0);")
