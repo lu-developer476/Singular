@@ -10,15 +10,17 @@ Singular (`.sg`) is a minimal language for deterministic calculations and data t
 - Imports use `import "module.sg" as alias;`.
 - Builtins include `range`, `len`, `push`, `pop`, `first`, `last`, `keys`, `values`, `has`, `join`, `split`, `str`, and `type`.
 
-## JSON built-ins
+## Strict JSON built-ins
 
 - `json_parse(text)` parses JSON text into Singular values.
-- `json_stringify(value)` emits compact JSON with lexicographically sorted object keys, preserved Unicode, and strict rejection of non-finite numbers or unsupported values.
+- `json_stringify(value)` emits compact JSON with lexicographically sorted object keys and preserved Unicode.
+- Parsing rejects `NaN`, infinities, duplicate object keys, and numbers outside the finite floating-point range supported by the runtime.
+- Serialization requires text object keys and JSON-compatible values; unsupported values and non-finite numbers are rejected.
 
 This makes JSON output reproducible for data pipelines and small verification programs:
 
 ```singular
-value input = json_parse("{\"count\":3,\"valid\":true}");
+value input = json_parse("{\\"count\\":3,\\"valid\\":true}");
 print(json_stringify(input));
 ```
 
