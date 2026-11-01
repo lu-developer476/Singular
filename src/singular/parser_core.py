@@ -1,4 +1,5 @@
 from src.common import ast
+from src.common.errors import ParseError
 from src.common.parser_base import ParserBase
 from src.common.pratt import ExpressionParserMixin
 class SingularParser(ExpressionParserMixin,ParserBase):
@@ -8,7 +9,10 @@ class SingularParser(ExpressionParserMixin,ParserBase):
   return ast.Program(out)
  def block(self):
   self.expect('{');a=[]
-  while not self.check('}'):a.append(self.stmt())
+  while not self.check('}'):
+   if self.check('EOF'):
+    t=self.peek(); raise ParseError('Unterminated block',t.line,t.column)
+   a.append(self.stmt())
   self.expect('}');return a
  def semi(self):self.expect(';')
  def stmt(self):
@@ -37,5 +41,8 @@ class SingularParser(ExpressionParserMixin,ParserBase):
    v=self.expression();self.semi()
    if isinstance(e,ast.Variable):return ast.Assign(e.name,v)
    if isinstance(e,ast.Index):return ast.IndexAssign(e.target,e.index,v)
+   t=self.peek(); raise ParseError('Invalid assignment target',t.line,t.column)
   else:self.semi()
+  if isinstance(e,ast.Variable) or isinstance(e,ast.Index):
+   return ast.ExprStmt(e)
   return ast.ExprStmt(e)

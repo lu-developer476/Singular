@@ -49,7 +49,7 @@ class VM:
   finally:self.env=old
  def stmt(self,s):
   if isinstance(s,ast.ImportStmt):
-   if not self.path or not self.loader:raise RuntimeLangError('imports require file execution')
+   if not self.path or not self.loader:raise RuntimeLangError('imports require a file-backed program')
    p=Path(s.path);q=(self.path.parent/p).resolve()
    if p.is_absolute() or p.suffix!=self.extension or not q.is_relative_to(self.root):raise RuntimeLangError('invalid module path')
    if q in self.loading:raise RuntimeLangError('cyclic module import')
@@ -94,3 +94,60 @@ class VM:
    return f(a)
   raise RuntimeLangError('unknown expression')
 Interpreter=VM
+
+
+# Keep implementation details private while exposing stable language-level errors.
+from .errors import LanguageError
+_BaseInterpreter = Interpreter
+
+class Interpreter(_BaseInterpreter):
+ def run(self, program, source_path=None):
+  try:
+   return super().run(program, source_path=source_path)
+  except LanguageError:
+   raise
+  except Exception as error:
+   raise RuntimeLangError('runtime operation failed: ' + str(error)) from error
+ def expr(self, expression):
+  if isinstance(expression, ast.Binary) and expression.op == 'and':
+   return bool(self.expr(expression.left)) and bool(self.expr(expression.right))
+  if isinstance(expression, ast.Binary) and expression.op == 'or':
+   return bool(self.expr(expression.left)) or bool(self.expr(expression.right))
+  return super().expr(expression)
+
+ def __init__(self, printer=print, loader=None, extension='.sg'):
+  super().__init__(printer, loader, extension)
+  self.global_env = self.env
+ def import_module(self, statement):
+  if not self.path or not self.loader or not self.root:
+   raise RuntimeLangError('imports require a file-backed program')
+  requested = Path(statement.path)
+  if requested.is_absolute() or requested.suffix != self.extension:
+   raise RuntimeLangError('invalid module path or extension')
+  try:
+   target = (self.path.parent / requested).resolve(strict=True)
+  except OSError as error:
+   raise RuntimeLangError('cannot resolve module: ' + str(error)) from error
+  if not target.is_relative_to(self.root):
+   raise RuntimeLangError('module path escapes the project directory')
+  if target in self.loading:
+   raise RuntimeLangError('cyclic module import detected')
+  if target not in self.cache:
+   self.loading.add(target)
+   previous_path, previous_env = self.path, self.env
+   module_env = Env(self.global_env)
+   try:
+    self.path = target
+    self.env = module_env
+    source = target.read_text(encoding='utf-8')
+    self.block(self.loader(source).statements, module_env)
+    self.cache[target] = {name: value for name, value in module_env.d.items() if not name.startswith('_')}
+   finally:
+    self.path, self.env = previous_path, previous_env
+    self.loading.remove(target)
+  self.env.define(statement.alias, self.cache[target])
+
+ def stmt(self, statement):
+  if isinstance(statement, ast.ImportStmt):
+   return self.import_module(statement)
+  return super().stmt(statement)
