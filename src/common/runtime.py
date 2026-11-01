@@ -146,3 +146,8 @@ class Interpreter(_BaseInterpreter):
     self.path, self.env = previous_path, previous_env
     self.loading.remove(target)
   self.env.define(statement.alias, self.cache[target])
+
+ def stmt(self, statement):
+  if isinstance(statement, ast.ImportStmt):
+   return self.import_module(statement)
+  return super().stmt(statement)
