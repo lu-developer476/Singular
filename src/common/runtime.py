@@ -1,5 +1,6 @@
 import json
 import math
+from decimal import Decimal
 from pathlib import Path
 from . import ast
 from .errors import RuntimeLangError
@@ -21,6 +22,8 @@ def _parse_json_float(value):
     number = float(value)
     if not math.isfinite(number):
         raise ValueError(f"JSON number is outside the supported range: {value}")
+    if number == 0.0 and Decimal(value) != 0:
+        raise ValueError(f"JSON number is smaller than the supported floating-point range: {value}")
     return number
 
 
