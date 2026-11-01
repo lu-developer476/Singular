@@ -2,17 +2,18 @@
 
 **Singular** is a minimal, deterministic language for calculations, data transformations, and small verifiable programs.
 
-This repository contains the independent Python implementation of Singular, based on the v1.8.0 prototype. It does not depend on Kitsune or the original `Languages` repository.
+This repository contains the independent Python implementation of Singular. It does not depend on Kitsune; the `v1.8.1` revision hardens runtime behavior, diagnostics, and grammar isolation.
 
-## Current language surface
+## Language surface (v1.8.1)
 
 - `.sg` source files.
 - Explicit declarations: `value`, `fn`, `print`.
 - Semicolon-terminated statements and brace-delimited blocks.
-- Functions, lexical scopes, closures, `if` / `else`, `while`, and `for`.
+- Functions, lexical scopes, closures, `if` / `else`, `while`, and `for`; short-circuit boolean operators.
 - `break;`, `continue;`, arrays, maps, indexed access, and assignment.
 - Imports: `import "lib/numbers.sg" as numbers;`.
 - Built-ins for ranges, collections, type inspection, and string conversion.
+- Structured lexical/syntax diagnostics and normalized runtime errors.
 
 ## Requirements
 
