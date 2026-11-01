@@ -8,7 +8,7 @@
 - Explicit declarations: `value`, `fn`, `print`.
 - Semicolon-terminated statements and brace-delimited blocks.
 - Integer, decimal, and scientific-notation numeric literals (`1.25e-2`).
-- Decimal/scientific literals use finite IEEE-754 binary64 values; overflow and nonzero underflow-to-zero are rejected.
+- Decimal/scientific literals and arithmetic results use finite IEEE-754 binary64 values; literal overflow, nonzero underflow-to-zero, and non-finite arithmetic results are rejected.
 - Functions, lexical scopes, closures, `if` / `else`, `while`, and `for`; short-circuit boolean operators.
 - `break;`, `continue;`, arrays, maps, indexed access, and assignment.
 - Imports: `import "lib/numbers.sg" as numbers;`.
