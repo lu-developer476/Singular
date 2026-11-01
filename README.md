@@ -1,40 +1,43 @@
 # Singular
 
-**Singular** es un lenguaje minimalista y determinista para cálculo, transformaciones de datos y programas pequeños verificables.
+**Singular** is a minimal, deterministic language for calculations, data transformations, and small verifiable programs.
 
-Esta es la implementación independiente de Singular, separada del prototipo conjunto `Languages`. La versión inicial conserva el comportamiento de `Languages` v1.8.0. Lexer, AST y runtime viven en este repositorio para que el lenguaje pueda evolucionar y publicar versiones sin depender de Kitsune.
+This repository contains the independent Python implementation of Singular, based on the v1.8.0 prototype. It does not depend on Kitsune or the original `Languages` repository.
 
-## Características de v1.8.0
+## Current language surface
 
-- Sintaxis explícita: `value`, `fn`, `print`, sentencias terminadas en `;`.
-- Funciones, closures, scopes léxicos, condicionales y bucles `while` / `for`.
-- `break;` y `continue;` locales al bucle actual.
-- Arrays, mapas, acceso indexado y asignación mutable.
-- Builtins: `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, `str`.
-- Imports `import "lib/numbers.sg" as numbers;`, con caché, scopes aislados y protección contra rutas externas y ciclos.
-- CLI `singular` y entrada estándar mediante `singular -`.
+- `.sg` source files.
+- Explicit declarations: `value`, `fn`, `print`.
+- Semicolon-terminated statements and brace-delimited blocks.
+- Functions, lexical scopes, closures, `if` / `else`, `while`, and `for`.
+- `break;`, `continue;`, arrays, maps, indexed access, and assignment.
+- Imports: `import "lib/numbers.sg" as numbers;`.
+- Built-ins for ranges, collections, type inspection, and string conversion.
 
-## Requisitos e instalación
+## Requirements
 
-Python 3.11+.
+Python 3.11 or newer.
+
+## Install
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+source .venv/bin/activate
 python -m pip install -e ".[dev]"
 ```
 
-## Ejecutar
+## Run
 
 ```bash
-singular examples/hello.sg
+singular path/to/program.sg
 ```
+
+## Example
 
 ```singular
 fn square(x) -> {
   return x * x;
 }
-
 value total = 0;
 for n in range(1, 5) {
   total = total + square(n);
@@ -42,25 +45,12 @@ for n in range(1, 5) {
 print(total);
 ```
 
-## Módulos
-
-Los imports son explícitos y requieren punto y coma. Se resuelven desde el archivo importador y quedan confinados al directorio raíz del proyecto:
-
-```singular
-import "lib/numbers.sg" as numbers;
-print(numbers.double(21));
-```
-
-Los nombres top-level que no empiezan con `_` se exponen en el alias. Cada módulo se ejecuta una vez por intérprete y conserva su entorno para closures.
-
-## Desarrollo
+## Test
 
 ```bash
 python -m pytest
 ```
 
-GitHub Actions ejecuta la suite en Python 3.11, 3.12 y 3.13. Consulta [`docs/language.md`](docs/language.md) para la referencia del lenguaje.
+## Design principle
 
-## Filosofía
-
-Singular prioriza previsibilidad, sintaxis explícita y resultados reproducibles. Su evolución debe favorecer programas pequeños verificables, transformaciones de datos y cálculo; no añadir expresividad por conveniencia si compromete su determinismo.
+Singular favors explicit syntax, predictable execution, and reproducible results. It should remain small and deterministic rather than adopting expressive conveniences merely because they are easy to implement.
