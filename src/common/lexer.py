@@ -6,7 +6,10 @@ class Token:
     value: object
     line: int
     column: int
-KEYWORDS=set('value fn print if else while for in return true false nil and or not range break continue import as'.split())
+COMMON_KEYWORDS = {'if', 'else', 'while', 'for', 'in', 'return', 'true', 'false', 'nil', 'and', 'or', 'not', 'break', 'continue', 'import', 'as'}
+KITSUNE_KEYWORDS = COMMON_KEYWORDS | {'let', 'spell', 'echo'}
+SINGULAR_KEYWORDS = COMMON_KEYWORDS | {'value', 'fn', 'print'}
+KEYWORDS = KITSUNE_KEYWORDS | SINGULAR_KEYWORDS
 class Lexer:
     def __init__(self, source): self.source=source; self.i=0; self.line=1; self.col=1
     def peek(self,n=0): return self.source[self.i+n] if self.i+n<len(self.source) else '\0'
@@ -28,7 +31,7 @@ class Lexer:
             if c.isalpha() or c=='_':
                 s=''
                 while self.peek().isalnum() or self.peek()=='_': s+=self.advance()
-                out.append(Token(s if s in KEYWORDS else 'IDENT',s,line,col)); continue
+                out.append(Token(s if s in self.keywords else 'IDENT',s,line,col)); continue
             if c=='"':
                 self.advance(); s=''
                 while self.peek() not in ('"','\0'): s+=self.advance()
