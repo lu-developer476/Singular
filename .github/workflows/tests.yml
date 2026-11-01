@@ -18,3 +18,11 @@ jobs:
       - run: python -m pytest
       - run: singular examples/square.sg
       - run: singular format --check examples/square.sg
+      - name: Build wheel
+        run: python -m pip wheel --no-deps --wheel-dir dist .
+      - name: Install and smoke-test wheel
+        run: |
+          python -m venv "$RUNNER_TEMP/singular-wheel-venv"
+          "$RUNNER_TEMP/singular-wheel-venv/bin/python" -m pip install --no-deps dist/*.whl
+          "$RUNNER_TEMP/singular-wheel-venv/bin/singular" examples/square.sg
+          "$RUNNER_TEMP/singular-wheel-venv/bin/singular" format --check examples/square.sg
