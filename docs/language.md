@@ -42,7 +42,7 @@ print(json_stringify(input));
 - Integer arithmetic retains arbitrary precision; decimal and scientific literals use IEEE-754 binary64.
 - Numeric comparisons are exact language comparisons. No epsilon or tolerance is applied automatically: for example, `0.1 + 0.2 == 0.3` evaluates to `false`.
 - Mixed integer/float comparisons follow the runtime's numeric comparison semantics; large integers are not rounded merely by being stored or serialized as integers.
-- Arithmetic that produces a non-finite float is rejected. JSON parsing also rejects nonzero decimal values that would silently underflow to zero, while preserving exact zero and representable subnormal values. JSON serialization is compact, sorts object keys lexicographically, preserves Unicode, and rejects non-finite values. This defines stable output for the same values; it is not a promise of bit-identical floating-point results across different hardware or runtimes.
+- Arithmetic that produces a non-finite float is rejected. JSON parsing also rejects nonzero decimal values that would silently underflow to zero, while preserving exact zero and representable subnormal values. JSON serialization is compact, sorts object keys lexicographically, preserves Unicode, and rejects non-finite values. This defines stable output for the same values; it is not a promise of bit-identical floating-point results across different hardware or runtimes. The numeric regression suite also exercises arbitrary-precision integer identities, exact mixed comparisons around 2^53, and JSON acceptance/rejection at the binary64 subnormal and finite-range boundaries.
 
 ## Runtime behavior
 
