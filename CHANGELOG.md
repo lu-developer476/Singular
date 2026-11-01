@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.3
+
+- Reject decimal/scientific numeric literals that overflow IEEE-754 binary64.
+- Reject nonzero decimal/scientific literals that underflow to zero while preserving representable subnormal values.
+- Report numeric range failures as source-located lexical errors.
+
 ## 2.5.2
 
 - Add decimal and scientific-notation numeric literals.
