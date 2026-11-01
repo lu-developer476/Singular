@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from decimal import Decimal
+import math
+
 from .errors import LexError
 
 
@@ -25,12 +28,12 @@ class Lexer:
         self.keywords = KEYWORDS if keywords is None else keywords
 
     def peek(self, n=0):
-        return self.source[self.i+n] if self.i+n < len(self.source) else '\0'
+        return self.source[self.i+n] if self.i+n < len(self.source) else '\\0'
 
     def advance(self):
         c = self.peek()
         self.i += 1
-        if c == '\n':
+        if c == '\\n':
             self.line += 1
             self.col = 1
         else:
@@ -56,11 +59,22 @@ class Lexer:
                 raise LexError('Invalid numeric exponent', line, col)
             while self.peek().isdigit():
                 text += self.advance()
-        return Token('NUMBER', float(text) if is_float else int(text), line, col)
+        if not is_float:
+            return Token('NUMBER', int(text), line, col)
+        try:
+            exact_value = Decimal(text)
+            value = float(exact_value)
+        except (ValueError, OverflowError):
+            raise LexError('Numeric literal is outside the supported range', line, col) from None
+        if not math.isfinite(value):
+            raise LexError('Numeric literal exceeds the finite floating-point range', line, col)
+        if value == 0.0 and not exact_value.is_zero():
+            raise LexError('Numeric literal is smaller than the supported floating-point range', line, col)
+        return Token('NUMBER', value, line, col)
 
     def tokens(self):
         out = []
-        while self.peek() != '\0':
+        while self.peek() != '\\0':
             c = self.peek()
             if c.isspace():
                 self.advance()
@@ -78,17 +92,17 @@ class Lexer:
             if c == '"':
                 self.advance()
                 s = ''
-                escapes = {'n': '\n', 't': '\t', '"': '"', '\\': '\\'}
-                while self.peek() not in ('"', '\0'):
-                    if self.peek() == '\\':
+                escapes = {'n': '\\n', 't': '\\t', '"': '"', '\\\\': '\\\\'}
+                while self.peek() not in ('"', '\\0'):
+                    if self.peek() == '\\\\':
                         self.advance()
                         escaped = self.advance()
-                        if escaped == '\0':
+                        if escaped == '\\0':
                             raise LexError('Unterminated string escape', line, col)
                         s += escapes.get(escaped, escaped)
                     else:
                         s += self.advance()
-                if self.peek() == '\0':
+                if self.peek() == '\\0':
                     raise LexError('Unterminated string', line, col)
                 self.advance()
                 out.append(Token('STRING', s, line, col))
