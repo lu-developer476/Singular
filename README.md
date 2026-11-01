@@ -4,7 +4,7 @@
 
 This repository contains the independent Python implementation of Singular. It does not depend on Kitsune; the `v1.8.1` revision hardens runtime behavior, diagnostics, and grammar isolation.
 
-## Language surface (v1.8.1)
+## Language surface (v1.9.0)
 
 - `.sg` source files.
 - Explicit declarations: `value`, `fn`, `print`.
@@ -14,6 +14,7 @@ This repository contains the independent Python implementation of Singular. It d
 - Imports: `import "lib/numbers.sg" as numbers;`.
 - Built-ins for ranges, collections, type inspection, and string conversion.
 - Structured lexical/syntax diagnostics and normalized runtime errors.
+- Official formatter with write and check modes (`singular format`, `singular format --check`).
 
 ## Requirements
 
@@ -46,10 +47,12 @@ for n in range(1, 5) {
 print(total);
 ```
 
-## Test
+## Test and formatting
 
 ```bash
 python -m pytest
+singular format examples/square.sg
+singular format --check examples/square.sg
 ```
 
 ## Design principle

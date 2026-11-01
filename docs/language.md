@@ -17,3 +17,19 @@ Singular (`.sg`) is a minimal language for deterministic calculations and data t
 - Lexical and syntax errors include source line and column information.
 - Only Singular declaration words (`value`, `fn`, `print`) are reserved by this frontend; Kitsune's `let`, `spell`, and `echo` remain ordinary Singular identifiers.
 - Imports resolve relative to the importing file, are confined to the project root, require `.sg`, and are cached after a successful load.
+
+## Official formatter
+
+Format a source file in place:
+
+```bash
+singular format path/to/program.sg
+```
+
+Check formatting without modifying the file:
+
+```bash
+singular format --check path/to/program.sg
+```
+
+The formatter parses the program before writing, preserves comments and string literals, uses four-space indentation, and is idempotent.
