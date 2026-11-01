@@ -79,7 +79,7 @@ def test_singular_numeric_comparisons_are_exact_not_tolerance_based():
 
 def test_singular_json_serialization_is_stable_and_round_trips():
     output = []
-    run('value data = json_parse("{\\\"z\\\":2,\\\"a\\\":\\\"café 🌙\\\"}"); print(json_stringify(data)); print(json_stringify(json_parse(json_stringify(data))));', output.append)
+    run(r'value data = json_parse("{\\"z\\":2,\\"a\\":\\"café 🌙\\"}"); print(json_stringify(data)); print(json_stringify(json_parse(json_stringify(data))));', output.append)
     assert output == ['{"a":"café 🌙","z":2}', '{"a":"café 🌙","z":2}']
 
 
