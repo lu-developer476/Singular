@@ -90,3 +90,37 @@ def test_singular_json_rejects_non_finite_and_preserves_large_integers():
     output = []
     run(r'print(json_stringify(json_parse("{\"integer\":900719925474099312345}")));', output.append)
     assert output == ['{"integer":900719925474099312345}']
+
+
+def test_singular_json_rejects_nonzero_float_underflow_but_accepts_zero_and_subnormal():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError, match="smaller than the supported floating-point range"):
+        run('print(json_parse("1e-9999"));')
+
+    output = []
+    run('print(json_stringify(json_parse("0e-9999"))); print(json_stringify(json_parse("5e-324")));', output.append)
+    assert output == ["0.0", "5e-324"]
+
+
+def test_singular_numeric_comparison_boundaries_follow_exact_python_numeric_order():
+    output = []
+    run(
+        "print(9007199254740993 == 9007199254740992.0); "
+        "print(9007199254740992 == 9007199254740992.0); "
+        "print(2.2250738585072014e-308 > 0); "
+        "print(1.7976931348623157e308 > 1e308);",
+        output.append,
+    )
+    assert output == ["false", "true", "true", "true"]
+
+
+def test_singular_json_serialization_is_independent_of_object_insertion_order():
+    output = []
+    run(
+        'print(json_stringify({z: 1, a: 2})); '
+        'print(json_stringify({a: 2, z: 1}));',
+        output.append,
+    )
+    assert output == ['{"a":2,"z":1}', '{"a":2,"z":1}']
