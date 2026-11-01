@@ -69,3 +69,26 @@ def test_singular_normalizes_division_by_zero():
 
     with pytest.raises(RuntimeLangError):
         run("print(1 / 0);")
+
+
+def test_singular_numeric_comparisons_are_exact_not_tolerance_based():
+    output = []
+    run("print(1 == 1.0); print(0.1 + 0.2 == 0.3); print(9007199254740993 == 9007199254740992);", output.append)
+    assert output == ["true", "false", "false"]
+
+
+def test_singular_json_serialization_is_stable_and_round_trips():
+    output = []
+    run('value data = json_parse("{\\\"z\\\":2,\\\"a\\\":\\\"café 🌙\\\"}"); print(json_stringify(data)); print(json_stringify(json_parse(json_stringify(data))));', output.append)
+    assert output == ['{"a":"café 🌙","z":2}', '{"a":"café 🌙","z":2}']
+
+
+def test_singular_json_rejects_non_finite_and_preserves_large_integers():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError):
+        run('print(json_stringify({value: 1e308 * 1e308}));')
+    output = []
+    run('print(json_stringify({integer: 900719925474099312345}));', output.append)
+    assert output == ['{"integer":900719925474099312345}']
