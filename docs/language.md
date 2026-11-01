@@ -10,6 +10,19 @@ Singular (`.sg`) is a minimal language for deterministic calculations and data t
 - Imports use `import "module.sg" as alias;`.
 - Builtins include `range`, `len`, `push`, `pop`, `first`, `last`, `keys`, `values`, `has`, `join`, `split`, `str`, and `type`.
 
+## Numeric literals
+
+Singular accepts integer, decimal, and scientific-notation literals:
+
+```singular
+print(42);
+print(0.125);
+print(1.25e-2);
+print(2e3);
+```
+
+Malformed exponents (for example, `3e+`) are rejected as lexical errors with source locations. Numeric literals use the runtime's standard integer and IEEE-754 floating-point representations.
+
 ## Strict JSON built-ins
 
 - `json_parse(text)` parses JSON text into Singular values.
