@@ -27,7 +27,7 @@ Integer literals use Python's arbitrary-precision integer representation. Decima
 
 - `json_parse(text)` parses JSON text into Singular values.
 - `json_stringify(value)` emits compact JSON with lexicographically sorted object keys and preserved Unicode.
-- Parsing rejects `NaN`, infinities, duplicate object keys, and numbers outside the finite floating-point range supported by the runtime.
+- Parsing rejects `NaN`, infinities, duplicate object keys, numbers outside the finite floating-point range, and nonzero decimal values that underflow to zero. Exact zero and representable subnormal values remain valid.
 - Serialization requires text object keys and JSON-compatible values; unsupported values and non-finite numbers are rejected.
 
 This makes JSON output reproducible for data pipelines and small verification programs:
@@ -42,7 +42,7 @@ print(json_stringify(input));
 - Integer arithmetic retains arbitrary precision; decimal and scientific literals use IEEE-754 binary64.
 - Numeric comparisons are exact language comparisons. No epsilon or tolerance is applied automatically: for example, `0.1 + 0.2 == 0.3` evaluates to `false`.
 - Mixed integer/float comparisons follow the runtime's numeric comparison semantics; large integers are not rounded merely by being stored or serialized as integers.
-- Arithmetic that produces a non-finite float is rejected. JSON serialization is compact, sorts object keys lexicographically, preserves Unicode, and rejects non-finite values. This defines stable output for the same values; it is not a promise of bit-identical floating-point results across different hardware or runtimes.
+- Arithmetic that produces a non-finite float is rejected. JSON parsing also rejects nonzero decimal values that would silently underflow to zero, while preserving exact zero and representable subnormal values. JSON serialization is compact, sorts object keys lexicographically, preserves Unicode, and rejects non-finite values. This defines stable output for the same values; it is not a promise of bit-identical floating-point results across different hardware or runtimes.
 
 ## Runtime behavior
 
