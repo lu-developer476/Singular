@@ -2,11 +2,12 @@
 
 **Singular** is a minimal, deterministic language for calculations, data transformations, and small verifiable programs.
 
-## Language surface (v2.5.1)
+## Language surface (v2.5.2)
 
 - `.sg` source files.
 - Explicit declarations: `value`, `fn`, `print`.
 - Semicolon-terminated statements and brace-delimited blocks.
+- Integer, decimal, and scientific-notation numeric literals (`1.25e-2`).
 - Functions, lexical scopes, closures, `if` / `else`, `while`, and `for`; short-circuit boolean operators.
 - `break;`, `continue;`, arrays, maps, indexed access, and assignment.
 - Imports: `import "lib/numbers.sg" as numbers;`.
