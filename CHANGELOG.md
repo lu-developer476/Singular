@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.4
+
+- Reject arithmetic results that become `NaN` or infinite under IEEE-754 binary64.
+- Preserve arbitrary-precision integer arithmetic and finite floating-point calculations.
+- Add regression tests for overflow, division by zero, integer precision, division, and modulo.
+
 ## 2.5.3
 
 - Reject decimal/scientific numeric literals that overflow IEEE-754 binary64.
