@@ -11,7 +11,9 @@ KITSUNE_KEYWORDS = COMMON_KEYWORDS | {'let', 'spell', 'echo'}
 SINGULAR_KEYWORDS = COMMON_KEYWORDS | {'value', 'fn', 'print'}
 KEYWORDS = KITSUNE_KEYWORDS | SINGULAR_KEYWORDS
 class Lexer:
-    def __init__(self, source): self.source=source; self.i=0; self.line=1; self.col=1
+    def __init__(self, source, keywords=None):
+        self.source=source; self.i=0; self.line=1; self.col=1
+        self.keywords=KEYWORDS if keywords is None else keywords
     def peek(self,n=0): return self.source[self.i+n] if self.i+n<len(self.source) else '\0'
     def advance(self):
         c=self.peek(); self.i+=1
@@ -35,11 +37,11 @@ class Lexer:
             if c=='"':
                 self.advance(); s=''
                 while self.peek() not in ('"','\0'): s+=self.advance()
-                if self.peek()=='\0': raise LexError('Unterminated string')
+                if self.peek()=='\0': raise LexError('Unterminated string',line,col)
                 self.advance(); out.append(Token('STRING',s,line,col)); continue
             pair=c+self.peek(1)
             if pair in ('==','!=','<=','>=','->'):
                 self.advance(); self.advance(); out.append(Token(pair,pair,line,col)); continue
             if c in '+-*/%=<>(){}[],;:.': self.advance(); out.append(Token(c,c,line,col)); continue
-            raise LexError('Unexpected character')
+            raise LexError('Unexpected character',line,col)
         out.append(Token('EOF',None,self.line,self.col)); return out
