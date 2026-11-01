@@ -94,3 +94,23 @@ class VM:
    return f(a)
   raise RuntimeLangError('unknown expression')
 Interpreter=VM
+
+
+# Keep implementation details private while exposing stable language-level errors.
+from .errors import LanguageError
+_BaseInterpreter = Interpreter
+
+class Interpreter(_BaseInterpreter):
+ def run(self, program, source_path=None):
+  try:
+   return super().run(program, source_path=source_path)
+  except LanguageError:
+   raise
+  except Exception as error:
+   raise RuntimeLangError('runtime operation failed: ' + str(error)) from error
+ def expr(self, expression):
+  if isinstance(expression, ast.Binary) and expression.op == 'and':
+   return bool(self.expr(expression.left)) and bool(self.expr(expression.right))
+  if isinstance(expression, ast.Binary) and expression.op == 'or':
+   return bool(self.expr(expression.left)) or bool(self.expr(expression.right))
+  return super().expr(expression)
