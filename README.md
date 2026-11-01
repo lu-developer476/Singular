@@ -2,7 +2,7 @@
 
 **Singular** is a minimal, deterministic language for calculations, data transformations, and small verifiable programs.
 
-## Language surface (v2.5.0)
+## Language surface (v2.5.1)
 
 - `.sg` source files.
 - Explicit declarations: `value`, `fn`, `print`.
@@ -11,7 +11,7 @@
 - `break;`, `continue;`, arrays, maps, indexed access, and assignment.
 - Imports: `import "lib/numbers.sg" as numbers;`.
 - Built-ins for ranges, collections, type inspection, and string conversion.
-- JSON built-ins: `json_parse(text)` and `json_stringify(value)`; serialization sorts keys and rejects non-JSON values.
+- JSON built-ins: `json_parse(text)` and `json_stringify(value)`; compact, sorted output, preserved Unicode, and rejection of duplicate/non-text keys, unsupported values, non-standard constants, and out-of-range numbers.
 - Structured lexical/syntax diagnostics, normalized runtime errors, and an official formatter.
 
 ## Requirements and installation
@@ -40,7 +40,7 @@ value total = 0;
 for n in range(1, 5) {
   total = total + square(n);
 }
-value record = json_parse("{\"result\":\"ok\",\"total\":10}");
+value record = json_parse("{\\"result\\":\\"ok\\",\\"total\\":10}");
 print(json_stringify(record));
 ```
 
