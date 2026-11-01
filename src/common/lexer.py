@@ -28,12 +28,12 @@ class Lexer:
         self.keywords = KEYWORDS if keywords is None else keywords
 
     def peek(self, n=0):
-        return self.source[self.i+n] if self.i+n < len(self.source) else '\\0'
+        return self.source[self.i+n] if self.i+n < len(self.source) else '\0'
 
     def advance(self):
         c = self.peek()
         self.i += 1
-        if c == '\\n':
+        if c == '\n':
             self.line += 1
             self.col = 1
         else:
@@ -74,7 +74,7 @@ class Lexer:
 
     def tokens(self):
         out = []
-        while self.peek() != '\\0':
+        while self.peek() != '\0':
             c = self.peek()
             if c.isspace():
                 self.advance()
@@ -92,17 +92,17 @@ class Lexer:
             if c == '"':
                 self.advance()
                 s = ''
-                escapes = {'n': '\\n', 't': '\\t', '"': '"', '\\\\': '\\\\'}
-                while self.peek() not in ('"', '\\0'):
-                    if self.peek() == '\\\\':
+                escapes = {'n': '\n', 't': '\t', '"': '"', '\\': '\\'}
+                while self.peek() not in ('"', '\0'):
+                    if self.peek() == '\\':
                         self.advance()
                         escaped = self.advance()
-                        if escaped == '\\0':
+                        if escaped == '\0':
                             raise LexError('Unterminated string escape', line, col)
                         s += escapes.get(escaped, escaped)
                     else:
                         s += self.advance()
-                if self.peek() == '\\0':
+                if self.peek() == '\0':
                     raise LexError('Unterminated string', line, col)
                 self.advance()
                 out.append(Token('STRING', s, line, col))
