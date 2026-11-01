@@ -1,4 +1,5 @@
 from src.common import ast
+from src.common.errors import ParseError
 from src.common.parser_base import ParserBase
 from src.common.pratt import ExpressionParserMixin
 class SingularParser(ExpressionParserMixin,ParserBase):
@@ -38,4 +39,6 @@ class SingularParser(ExpressionParserMixin,ParserBase):
    if isinstance(e,ast.Variable):return ast.Assign(e.name,v)
    if isinstance(e,ast.Index):return ast.IndexAssign(e.target,e.index,v)
   else:self.semi()
+  if isinstance(e,ast.Variable) or isinstance(e,ast.Index):
+   return ast.ExprStmt(e)
   return ast.ExprStmt(e)
