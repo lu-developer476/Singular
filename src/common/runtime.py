@@ -172,7 +172,11 @@ class Interpreter(_BaseInterpreter):
    return bool(self.expr(expression.left)) and bool(self.expr(expression.right))
   if isinstance(expression, ast.Binary) and expression.op == 'or':
    return bool(self.expr(expression.left)) or bool(self.expr(expression.right))
-  return super().expr(expression)
+  result = super().expr(expression)
+  if isinstance(expression, (ast.Binary, ast.Unary)) and isinstance(result, float):
+   if not math.isfinite(result):
+    raise RuntimeLangError('arithmetic operation produced a non-finite number')
+  return result
 
  def __init__(self, printer=print, loader=None, extension='.sg'):
   super().__init__(printer, loader, extension)
