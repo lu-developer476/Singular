@@ -41,6 +41,7 @@ print(json_stringify(input));
 
 - `and` and `or` short-circuit and return boolean values.
 - Runtime failures (invalid operations, indexing, and builtin calls) are normalized to `RuntimeLangError`.
+- Arithmetic operations that produce non-finite floating-point results (`NaN` or infinity) are rejected as `RuntimeLangError`; arbitrary-precision integer arithmetic remains available.
 - Lexical and syntax errors include source line and column information.
 - Only Singular declaration words (`value`, `fn`, `print`) are reserved by this frontend; Kitsune's `let`, `spell`, and `echo` remain ordinary Singular identifiers.
 - Imports resolve relative to the importing file, are confined to the project root, require `.sg`, and are cached after a successful load.
