@@ -2,6 +2,55 @@ import json
 from pathlib import Path
 from . import ast
 from .errors import RuntimeLangError
+
+def _reject_json_constant(value):
+    raise ValueError(f"invalid JSON numeric constant: {value}")
+
+
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON object key: {key}")
+        result[key] = value
+    return result
+
+
+def json_parse_strict(source):
+    if not isinstance(source, str):
+        raise TypeError("json_parse expects text")
+    return json.loads(
+        source,
+        parse_constant=_reject_json_constant,
+        object_pairs_hook=_unique_json_object,
+    )
+
+
+def _validate_json_value(value):
+    if value is None or isinstance(value, (str, bool, int, float)):
+        return
+    if isinstance(value, list):
+        for item in value:
+            _validate_json_value(item)
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise TypeError("JSON object keys must be text")
+            _validate_json_value(item)
+        return
+    raise TypeError(f"value of type {type(value).__name__} is not JSON-compatible")
+
+
+def json_stringify_strict(value):
+    _validate_json_value(value)
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
 class R(Exception):
  def __init__(self,v):self.v=v
 class B(Exception):pass
@@ -29,7 +78,7 @@ class Fn:
 class VM:
  def __init__(self,printer=print,loader=None,extension='.sg'):
   self.printer=printer;self.loader=loader;self.extension=extension;self.env=Env();self.root=None;self.path=None;self.cache={};self.loading=set()
-  f={'range':lambda *a:list(range(*map(int,a))),'len':len,'push':lambda a,x:(a.append(x) or a),'pop':lambda a:a.pop() if a else None,'first':lambda a:a[0] if a else None,'last':lambda a:a[-1] if a else None,'keys':lambda x:list(x.keys()),'values':lambda x:list(x.values()),'has':lambda x,k:k in x,'join':lambda a,s:s.join(map(str,a)),'split':lambda s,d:s.split(d),'str':str,'json_parse':json.loads,'json_stringify':lambda x:json.dumps(x,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False),'type':lambda x:'nil' if x is None else 'bool' if isinstance(x,bool) else 'number' if isinstance(x,(int,float)) else 'text' if isinstance(x,str) else 'array' if isinstance(x,list) else 'map'}
+  f={'range':lambda *a:list(range(*map(int,a))),'len':len,'push':lambda a,x:(a.append(x) or a),'pop':lambda a:a.pop() if a else None,'first':lambda a:a[0] if a else None,'last':lambda a:a[-1] if a else None,'keys':lambda x:list(x.keys()),'values':lambda x:list(x.values()),'has':lambda x,k:k in x,'join':lambda a,s:s.join(map(str,a)),'split':lambda s,d:s.split(d),'str':str,'json_parse':json_parse_strict,'json_stringify':json_stringify_strict,'type':lambda x:'nil' if x is None else 'bool' if isinstance(x,bool) else 'number' if isinstance(x,(int,float)) else 'text' if isinstance(x,str) else 'array' if isinstance(x,list) else 'map'}
   for k,v in f.items():self.env.define(k,lambda a,v=v:v(*a))
  def show(self,x):
   if x is None:return 'nil'
