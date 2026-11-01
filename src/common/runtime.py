@@ -114,3 +114,35 @@ class Interpreter(_BaseInterpreter):
   if isinstance(expression, ast.Binary) and expression.op == 'or':
    return bool(self.expr(expression.left)) or bool(self.expr(expression.right))
   return super().expr(expression)
+
+ def __init__(self, printer=print, loader=None, extension='.sg'):
+  super().__init__(printer, loader, extension)
+  self.global_env = self.env
+ def import_module(self, statement):
+  if not self.path or not self.loader or not self.root:
+   raise RuntimeLangError('imports require a file-backed program')
+  requested = Path(statement.path)
+  if requested.is_absolute() or requested.suffix != self.extension:
+   raise RuntimeLangError('invalid module path or extension')
+  try:
+   target = (self.path.parent / requested).resolve(strict=True)
+  except OSError as error:
+   raise RuntimeLangError('cannot resolve module: ' + str(error)) from error
+  if not target.is_relative_to(self.root):
+   raise RuntimeLangError('module path escapes the project directory')
+  if target in self.loading:
+   raise RuntimeLangError('cyclic module import detected')
+  if target not in self.cache:
+   self.loading.add(target)
+   previous_path, previous_env = self.path, self.env
+   module_env = Env(self.global_env)
+   try:
+    self.path = target
+    self.env = module_env
+    source = target.read_text(encoding='utf-8')
+    self.block(self.loader(source).statements, module_env)
+    self.cache[target] = {name: value for name, value in module_env.d.items() if not name.startswith('_')}
+   finally:
+    self.path, self.env = previous_path, previous_env
+    self.loading.remove(target)
+  self.env.define(statement.alias, self.cache[target])
