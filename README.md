@@ -2,9 +2,7 @@
 
 **Singular** is a minimal, deterministic language for calculations, data transformations, and small verifiable programs.
 
-This repository contains the independent Python implementation of Singular. It does not depend on Kitsune; the `v1.8.1` revision hardens runtime behavior, diagnostics, and grammar isolation.
-
-## Language surface (v1.9.0)
+## Language surface (v2.5.0)
 
 - `.sg` source files.
 - Explicit declarations: `value`, `fn`, `print`.
@@ -13,14 +11,12 @@ This repository contains the independent Python implementation of Singular. It d
 - `break;`, `continue;`, arrays, maps, indexed access, and assignment.
 - Imports: `import "lib/numbers.sg" as numbers;`.
 - Built-ins for ranges, collections, type inspection, and string conversion.
-- Structured lexical/syntax diagnostics and normalized runtime errors.
-- Official formatter with write and check modes (`singular format`, `singular format --check`).
+- JSON built-ins: `json_parse(text)` and `json_stringify(value)`; serialization sorts keys and rejects non-JSON values.
+- Structured lexical/syntax diagnostics, normalized runtime errors, and an official formatter.
 
-## Requirements
+## Requirements and installation
 
 Python 3.11 or newer.
-
-## Install
 
 ```bash
 python -m venv .venv
@@ -44,7 +40,8 @@ value total = 0;
 for n in range(1, 5) {
   total = total + square(n);
 }
-print(total);
+value record = json_parse("{\"result\":\"ok\",\"total\":10}");
+print(json_stringify(record));
 ```
 
 ## Test and formatting
@@ -54,7 +51,5 @@ python -m pytest
 singular format examples/square.sg
 singular format --check examples/square.sg
 ```
-
-## Design principle
 
 Singular favors explicit syntax, predictable execution, and reproducible results. It should remain small and deterministic rather than adopting expressive conveniences merely because they are easy to implement.
