@@ -9,7 +9,10 @@ class SingularParser(ExpressionParserMixin,ParserBase):
   return ast.Program(out)
  def block(self):
   self.expect('{');a=[]
-  while not self.check('}'):a.append(self.stmt())
+  while not self.check('}'):
+   if self.check('EOF'):
+    t=self.peek(); raise ParseError('Unterminated block',t.line,t.column)
+   a.append(self.stmt())
   self.expect('}');return a
  def semi(self):self.expect(';')
  def stmt(self):
