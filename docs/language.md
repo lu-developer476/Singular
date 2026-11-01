@@ -21,7 +21,7 @@ print(1.25e-2);
 print(2e3);
 ```
 
-Malformed exponents (for example, `3e+`) are rejected as lexical errors with source locations. Numeric literals use the runtime's standard integer and IEEE-754 floating-point representations.
+Integer literals use Python's arbitrary-precision integer representation. Decimal and scientific-notation literals use IEEE-754 binary64. Non-finite results from literal conversion are rejected, as are nonzero decimal literals that underflow all the way to zero. Representable subnormal values remain valid. Malformed exponents (for example, `3e+`) are rejected as lexical errors with source locations.
 
 ## Strict JSON built-ins
 
@@ -33,7 +33,7 @@ Malformed exponents (for example, `3e+`) are rejected as lexical errors with sou
 This makes JSON output reproducible for data pipelines and small verification programs:
 
 ```singular
-value input = json_parse("{\\"count\\":3,\\"valid\\":true}");
+value input = json_parse("{\"count\":3,\"valid\":true}");
 print(json_stringify(input));
 ```
 

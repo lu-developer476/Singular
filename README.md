@@ -2,12 +2,13 @@
 
 **Singular** is a minimal, deterministic language for calculations, data transformations, and small verifiable programs.
 
-## Language surface (v2.5.2)
+## Language surface (v2.5.3)
 
 - `.sg` source files.
 - Explicit declarations: `value`, `fn`, `print`.
 - Semicolon-terminated statements and brace-delimited blocks.
 - Integer, decimal, and scientific-notation numeric literals (`1.25e-2`).
+- Decimal/scientific literals use finite IEEE-754 binary64 values; overflow and nonzero underflow-to-zero are rejected.
 - Functions, lexical scopes, closures, `if` / `else`, `while`, and `for`; short-circuit boolean operators.
 - `break;`, `continue;`, arrays, maps, indexed access, and assignment.
 - Imports: `import "lib/numbers.sg" as numbers;`.
@@ -41,7 +42,7 @@ value total = 0;
 for n in range(1, 5) {
   total = total + square(n);
 }
-value record = json_parse("{\\"result\\":\\"ok\\",\\"total\\":10}");
+value record = json_parse("{\"result\":\"ok\",\"total\":10}");
 print(json_stringify(record));
 ```
 

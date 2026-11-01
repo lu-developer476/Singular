@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from decimal import Decimal
+import math
+
 from .errors import LexError
 
 
@@ -56,7 +59,18 @@ class Lexer:
                 raise LexError('Invalid numeric exponent', line, col)
             while self.peek().isdigit():
                 text += self.advance()
-        return Token('NUMBER', float(text) if is_float else int(text), line, col)
+        if not is_float:
+            return Token('NUMBER', int(text), line, col)
+        try:
+            exact_value = Decimal(text)
+            value = float(exact_value)
+        except (ValueError, OverflowError):
+            raise LexError('Numeric literal is outside the supported range', line, col) from None
+        if not math.isfinite(value):
+            raise LexError('Numeric literal exceeds the finite floating-point range', line, col)
+        if value == 0.0 and not exact_value.is_zero():
+            raise LexError('Numeric literal is smaller than the supported floating-point range', line, col)
+        return Token('NUMBER', value, line, col)
 
     def tokens(self):
         out = []
