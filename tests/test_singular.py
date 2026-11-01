@@ -119,8 +119,8 @@ def test_singular_numeric_comparison_boundaries_follow_exact_python_numeric_orde
 def test_singular_json_serialization_is_independent_of_object_insertion_order():
     output = []
     run(
-        'print(json_stringify({z: 1, a: 2})); '
-        'print(json_stringify({a: 2, z: 1}));',
+        'print(json_stringify({"z": 1, "a": 2})); '
+        'print(json_stringify({"a": 2, "z": 1}));',
         output.append,
     )
     assert output == ['{"a":2,"z":1}', '{"a":2,"z":1}']
