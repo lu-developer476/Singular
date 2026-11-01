@@ -12,6 +12,8 @@ class SingularParser(ExpressionParserMixin,ParserBase):
   self.expect('}');return a
  def semi(self):self.expect(';')
  def stmt(self):
+  if self.match('import'):
+   p=self.expect('STRING').value;self.expect('as');n=self.expect('IDENT').value;self.semi();return ast.ImportStmt(p,n)
   if self.match('value'):
    n=self.expect('IDENT').value;self.expect('=');e=self.expression();self.semi();return ast.VarDecl(n,e)
   if self.match('fn'):
