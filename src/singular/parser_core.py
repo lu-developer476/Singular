@@ -38,6 +38,7 @@ class SingularParser(ExpressionParserMixin,ParserBase):
    v=self.expression();self.semi()
    if isinstance(e,ast.Variable):return ast.Assign(e.name,v)
    if isinstance(e,ast.Index):return ast.IndexAssign(e.target,e.index,v)
+   t=self.peek(); raise ParseError('Invalid assignment target',t.line,t.column)
   else:self.semi()
   if isinstance(e,ast.Variable) or isinstance(e,ast.Index):
    return ast.ExprStmt(e)
