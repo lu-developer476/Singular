@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from . import ast
 from .errors import RuntimeLangError
@@ -28,7 +29,7 @@ class Fn:
 class VM:
  def __init__(self,printer=print,loader=None,extension='.sg'):
   self.printer=printer;self.loader=loader;self.extension=extension;self.env=Env();self.root=None;self.path=None;self.cache={};self.loading=set()
-  f={'range':lambda *a:list(range(*map(int,a))),'len':len,'push':lambda a,x:(a.append(x) or a),'pop':lambda a:a.pop() if a else None,'first':lambda a:a[0] if a else None,'last':lambda a:a[-1] if a else None,'keys':lambda x:list(x.keys()),'values':lambda x:list(x.values()),'has':lambda x,k:k in x,'join':lambda a,s:s.join(map(str,a)),'split':lambda s,d:s.split(d),'str':str,'type':lambda x:'nil' if x is None else 'bool' if isinstance(x,bool) else 'number' if isinstance(x,(int,float)) else 'text' if isinstance(x,str) else 'array' if isinstance(x,list) else 'map'}
+  f={'range':lambda *a:list(range(*map(int,a))),'len':len,'push':lambda a,x:(a.append(x) or a),'pop':lambda a:a.pop() if a else None,'first':lambda a:a[0] if a else None,'last':lambda a:a[-1] if a else None,'keys':lambda x:list(x.keys()),'values':lambda x:list(x.values()),'has':lambda x,k:k in x,'join':lambda a,s:s.join(map(str,a)),'split':lambda s,d:s.split(d),'str':str,'json_parse':json.loads,'json_stringify':lambda x:json.dumps(x,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False),'type':lambda x:'nil' if x is None else 'bool' if isinstance(x,bool) else 'number' if isinstance(x,(int,float)) else 'text' if isinstance(x,str) else 'array' if isinstance(x,list) else 'map'}
   for k,v in f.items():self.env.define(k,lambda a,v=v:v(*a))
  def show(self,x):
   if x is None:return 'nil'

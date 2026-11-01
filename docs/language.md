@@ -10,6 +10,18 @@ Singular (`.sg`) is a minimal language for deterministic calculations and data t
 - Imports use `import "module.sg" as alias;`.
 - Builtins include `range`, `len`, `push`, `pop`, `first`, `last`, `keys`, `values`, `has`, `join`, `split`, `str`, and `type`.
 
+## JSON built-ins
+
+- `json_parse(text)` parses JSON text into Singular values.
+- `json_stringify(value)` emits compact JSON with lexicographically sorted object keys, preserved Unicode, and strict rejection of non-finite numbers or unsupported values.
+
+This makes JSON output reproducible for data pipelines and small verification programs:
+
+```singular
+value input = json_parse("{\"count\":3,\"valid\":true}");
+print(json_stringify(input));
+```
+
 ## Runtime behavior
 
 - `and` and `or` short-circuit and return boolean values.
@@ -20,16 +32,4 @@ Singular (`.sg`) is a minimal language for deterministic calculations and data t
 
 ## Official formatter
 
-Format a source file in place:
-
-```bash
-singular format path/to/program.sg
-```
-
-Check formatting without modifying the file:
-
-```bash
-singular format --check path/to/program.sg
-```
-
-The formatter parses the program before writing, preserves comments and string literals, uses four-space indentation, and is idempotent.
+Format a source file in place with `singular format path/to/program.sg`; use `singular format --check path/to/program.sg` to verify formatting without modifying the file. The formatter parses the program before writing, preserves comments and string literals, uses four-space indentation, and is idempotent.
