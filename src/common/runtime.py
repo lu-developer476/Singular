@@ -49,7 +49,7 @@ class VM:
   finally:self.env=old
  def stmt(self,s):
   if isinstance(s,ast.ImportStmt):
-   if not self.path or not self.loader:raise RuntimeLangError('imports require file execution')
+   if not self.path or not self.loader:raise RuntimeLangError('imports require a file-backed program')
    p=Path(s.path);q=(self.path.parent/p).resolve()
    if p.is_absolute() or p.suffix!=self.extension or not q.is_relative_to(self.root):raise RuntimeLangError('invalid module path')
    if q in self.loading:raise RuntimeLangError('cyclic module import')
