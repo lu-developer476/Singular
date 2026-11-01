@@ -37,6 +37,27 @@ class Lexer:
             self.col += 1
         return c
 
+    def number(self, line, col):
+        text = ''
+        while self.peek().isdigit():
+            text += self.advance()
+        is_float = False
+        if self.peek() == '.' and self.peek(1).isdigit():
+            is_float = True
+            text += self.advance()
+            while self.peek().isdigit():
+                text += self.advance()
+        if self.peek() in ('e', 'E'):
+            is_float = True
+            text += self.advance()
+            if self.peek() in ('+', '-'):
+                text += self.advance()
+            if not self.peek().isdigit():
+                raise LexError('Invalid numeric exponent', line, col)
+            while self.peek().isdigit():
+                text += self.advance()
+        return Token('NUMBER', float(text) if is_float else int(text), line, col)
+
     def tokens(self):
         out = []
         while self.peek() != '\0':
@@ -46,10 +67,7 @@ class Lexer:
                 continue
             line, col = self.line, self.col
             if c.isdigit():
-                s = ''
-                while self.peek().isdigit():
-                    s += self.advance()
-                out.append(Token('NUMBER', int(s), line, col))
+                out.append(self.number(line, col))
                 continue
             if c.isalpha() or c == '_':
                 s = ''
